@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prima ta lună de adult</title>
+<style>
+:root{--bg:#171433;--bg2:#221E4A;--card:#2A2560;--line:#443E9A;--ink:#F4F2FF;--mute:#A9A3D9;--blue:#5B8CFF;--mint:#38E0A1;--coral:#FF6B81;--sun:#FFC845}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px}
+.app{max-width:680px;margin:0 auto;padding:0 14px 30px}
+.top{padding:18px 4px 8px}.top h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.3px}.top p{margin:2px 0 0;color:var(--mute);font-size:14px}
+#hud{position:sticky;top:0;z-index:5;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin:8px 0 14px;display:grid;grid-template-columns:1fr auto;gap:8px 12px;box-shadow:0 6px 0 #0E0B24}
+#hud:empty{display:none}
+.who{display:flex;gap:10px;align-items:center}.who small{display:block;color:var(--mute);font-size:12px}.who b{font-size:14px}
+.av{font-size:28px;background:var(--card);border-radius:12px;width:44px;height:44px;display:grid;place-items:center}
+.bal{text-align:right}.bal small{display:block;color:var(--mute);font-size:12px}
+.bal b{font-size:26px;font-weight:900;color:var(--mint);font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}.chips span{background:var(--card);border-radius:20px;padding:2px 12px}
+.track{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;list-style:none;margin:2px 0 0;padding:0}
+.track li{background:var(--card);border-radius:10px;padding:4px 6px;text-align:center;font-weight:900;font-size:14px;color:var(--mute);border-bottom:4px solid transparent}
+.track small{display:block;font-weight:400;font-size:11px}
+.track li.done{color:var(--mint);border-color:var(--mint)}.track li.now{color:#2a1d00;background:var(--sun);border-color:#C79500}
+.n{color:var(--coral)!important}.p{color:var(--mint)}
+#stage{background:var(--bg2);border:2px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 0 #0E0B24}
+.scene{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.ic{font-size:36px;width:64px;height:64px;flex:none;border-radius:18px;background:var(--card);display:grid;place-items:center;border-bottom:4px solid var(--line)}
+h2{margin:0;font-size:24px;font-weight:900;line-height:1.2}
+.txt p{margin:0 0 10px}
+.opts{display:grid;gap:10px;margin-top:18px;counter-reset:o}
+button{font:inherit;text-align:left;padding:12px 14px;border:2px solid var(--line);border-bottom-width:5px;background:var(--card);color:var(--ink);border-radius:14px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:transform .1s}
+.opts button::before{counter-increment:o;content:counter(o,upper-alpha);flex:none;width:28px;height:28px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-weight:900;font-size:13px}
+button:hover,button:focus-visible{border-color:var(--blue);transform:translateY(-2px);outline:none}
+button:active{transform:translateY(2px);border-bottom-width:3px}
+button.go{background:var(--sun);border-color:#C79500;color:#2a1d00;font-weight:900;justify-content:center;text-align:center}
+button.go::before{display:none}
+label{display:block;margin:12px 0 4px;font-weight:700;color:var(--mute);font-size:14px}
+select{width:100%;font:inherit;padding:11px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin:8px 0;background:var(--card);border-radius:12px}
+td{padding:7px 12px;border-bottom:1px solid var(--line)}td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.tip{background:rgba(255,200,69,.12);border-left:5px solid var(--sun);padding:8px 12px;margin:12px 0;border-radius:0 10px 10px 0}
+.score{font-size:72px;font-weight:900;margin:0;line-height:1}.stars{font-size:28px;color:var(--sun);margin:4px 0}
+.rank{font-size:20px;font-weight:900}
+details{margin-top:16px;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:12px 16px}
+summary{cursor:pointer;font-weight:900}
+#ledger{list-style:none;margin:10px 0 0;padding:0;max-height:340px;overflow:auto}
+#ledger li{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+#ledger small{display:block;color:var(--mute)}#ledger b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.toast{position:fixed;right:14px;top:130px;z-index:9;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:900;animation:t 2.4s forwards;pointer-events:none;font-variant-numeric:tabular-nums}
+@keyframes t{0%{opacity:0;transform:translateY(10px)}12%,80%{opacity:1;transform:none}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.toast{animation:none}button{transition:none}}
+.note{font-size:12px;color:var(--mute);text-align:center;padding:14px 8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><h1>Prima ta lună de adult</h1><p>Liceul s-a terminat. Banii, jobul și orașul sunt acum ale tale. Ai 4 săptămâni.</p></div>
+  <div id="hud"></div>
+  <main id="stage"></main>
+  <details open><summary>Extrasul tău de cont</summary><ul id="ledger"></ul></details>
+  <p class="note">Joc educațional cu bani fictivi. Cifrele sunt orientative; verifică taxele actuale pe anaf.ro.</p>
+</div>
+
+<script>
+/* ===== 1. DATELE JOCULUI: modifică aici cifrele ===== */
+const JOBS=[
+  {n:'Dezvoltator software',b:6500,e:'💻'},
+  {n:'Asistent medical',b:4500,e:'🩺'},
+  {n:'Electrician',b:5000,e:'🔧'},
+  {n:'Designer grafic',b:4800,e:'🎨'},
+  {n:'Operator call center',b:3800,e:'🎧'},
+  {n:'Contabil junior',b:4200,e:'📊'}
+]; // b = salariu brut lunar (lei)
+const CITIES=[
+  {n:'București',r:1900,t:100},
+  {n:'Cluj-Napoca',r:1800,t:80},
+  {n:'Timișoara',r:1400,t:80},
+  {n:'Iași',r:1300,t:70},
+  {n:'Bacău',r:1000,t:60}
+]; // r = chirie garsonieră / lună, t = abonament transport / lună
+const BUGETE=[3500,5000,7000];
+const FACTURI_SAPT=100;
+
+/* ===== 2. LOGICA ===== */
+const $=s=>document.querySelector(s);
+const fmt=n=>Math.round(n).toLocaleString('ro-RO')+' lei';
+let S;
+
+function add(d,a){S.bani+=a;S.log.unshift({d,a,w:S.w});toast(a,d);draw();}
+function toEco(x){S.bani-=x;S.eco+=x;S.log.unshift({d:'Transfer în fond de rezervă',a:-x,w:S.w});toast(-x,'Fond de rezervă');draw();}
+function toast(a,d){const t=document.createElement('div');t.className='toast '+(a<0?'n':'p');t.textContent=(a<0?'−':'+')+fmt(Math.abs(a))+' · '+d;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
+
+function draw(){
+  const h=$('#hud');
+  if(!S){h.innerHTML='';$('#ledger').innerHTML='';return;}
+  const nv=['Mutarea','Tentația','Surprizele','Bilanțul'];
+  h.innerHTML=`<div class="who"><span class="av">${S.job.e}</span><div><b>${S.job.n}</b><small>${S.city.n}</small></div></div>
+   <div class="bal"><small>Bani în cont</small><b class="${S.bani<0?'n':''}">${fmt(S.bani)}</b></div>
+   <div class="chips"><span>🛟 ${fmt(S.eco)}</span><span class="${S.dat>0?'n':''}">💳 ${fmt(S.dat)}</span></div>
+   <ol class="track">${nv.map((s,i)=>`<li class="${i+1<S.w?'done':i+1===S.w?'now':''}">${i+1}<small>${s}</small></li>`).join('')}</ol>`;
+  $('#ledger').innerHTML=S.log.map(l=>`<li><span>${l.d}<small>Săpt. ${l.w}</small></span><b class="${l.a<0?'n':'p'}">${l.a<0?'−':'+'}${fmt(Math.abs(l.a))}</b></li>`).join('');
+}
+
+function ICON(t){return/salariu/i.test(t)?'💸':/rezerv/i.test(t)?'🛟':/mănânci/i.test(t)?'🍜':/Sfârșit/.test(t)?'📆':/fără bani/.test(t)?'🚨':/TikTok/.test(t)?'📱':/Verificarea/.test(t)?'🔍':/side-hustle/.test(t)?'📦':/Laptop/.test(t)?'💻':/prieten/.test(t)?'🤝':/decizie/.test(t)?'🎯':/Bilanț/.test(t)?'🏆':'🎮';}
+
+function show(st){
+  $('#stage').innerHTML=`<div class="scene"><div class="ic">${ICON(st.t)}</div><h2>${st.t}</h2></div><div class="txt">${st.p}</div><div class="opts">${st.o.map((o,i)=>`<button data-i="${i}" class="${o.c||''}">${o.l}</button>`).join('')}</div>`;
+  $('#stage').querySelectorAll('button').forEach(b=>b.onclick=()=>st.o[b.dataset.i].f());
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function next(){
+  while(S.q.length){const st=S.q.shift()();if(st){show(st);return;}}
+}
+
+/* ----- ecranul de început ----- */
+function start(){
+  S=null;draw();
+  $('#stage').innerHTML=`<div class="scene"><div class="ic">🎮</div><h2>Alege-ți personajul</h2></div>
+  <div class="txt"><p>Ai terminat liceul și ai primul job. Te muți într-un oraș nou, cu banii tăi și cu primul salariu la început de lună. Cât reziști fără să te blochezi?</p></div>
+  <label for="j">Meseria ta</label><select id="j">${JOBS.map((j,i)=>`<option value="${i}">${j.e} ${j.n}</option>`).join('')}</select>
+  <label for="c">Orașul</label><select id="c">${CITIES.map((c,i)=>`<option value="${i}">${c.n} (chirie ${fmt(c.r)})</option>`).join('')}</select>
+  <label for="h">Locuința</label><select id="h"><option value="0">Garsonieră singur (chirie întreagă)</option><option value="1">Cu un coleg (jumătate din chirie)</option></select>
+  <label for="b">Banii cu care pornești</label><select id="b">${BUGETE.map(b=>`<option value="${b}">${fmt(b)}</option>`).join('')}</select>
+  <div class="opts"><button class="go" id="go">Începe jocul</button></div>`;
+  $('#go').onclick=()=>init(JOBS[$('#j').value],CITIES[$('#c').value],$('#h').value==='1',+$('#b').value);
+}
+
+function init(job,city,coloc,buget){
+  S={w:1,bani:0,eco:0,dat:0,job,city,chirie:coloc?city.r/2:city.r,mancare:380,fl:{},log:[],q:[]};
+  add('Buget de pornire',buget);
+  add('Garanție chirie',-S.chirie);
+  add('Prima chirie',-S.chirie);
+  S.q=[salariu,rezerva,mancare,()=>closeW(1),tentatie,()=>closeW(2),sideRes,laptop,()=>closeW(3),prieten,()=>closeW(4),decizie,final];
+  next();
+}
+
+/* ----- săptămâna 1 ----- */
+function salariu(){
+  const b=S.job.b,cas=b*.25,cass=b*.10,imp=(b-cas-cass)*.10,net=b-cas-cass-imp;
+  add('Primul salariu (net)',net);
+  return{t:'Ziua salariului',
+    p:`<p>Contractul tău spune <b>${fmt(b)}</b>, dar în cont intră mai puțin:</p>
+    <table><tr><td>Salariu brut</td><td>${fmt(b)}</td></tr>
+    <tr><td>Contribuție la pensie (25%)</td><td>−${fmt(cas)}</td></tr>
+    <tr><td>Contribuție la sănătate (10%)</td><td>−${fmt(cass)}</td></tr>
+    <tr><td>Impozit pe venit (10%)</td><td>−${fmt(imp)}</td></tr>
+    <tr><td><b>Salariu net, intrat în cont</b></td><td><b>${fmt(net)}</b></td></tr></table>
+    <div class="tip">Din ${fmt(b)} brut ai primit doar ${Math.round(net/b*100)}%. Procentele sunt simplificate.</div>`,
+    o:[{l:'Continuă',f:next,c:'go'}]};
+}
+function rezerva(){
+  const x=S.job.b*.585;
+  return{t:'Fondul de rezervă',p:'<p>Un specialist îți spune să pui bani deoparte din prima zi, pentru situațiile neprevăzute. Cât transferi din salariu?</p>',
+    o:[{l:`Pun 20% (${fmt(x*.2)})`,f:()=>{toEco(x*.2);S.fl.rez=1;next();}},
+       {l:`Pun 10% (${fmt(x*.1)})`,f:()=>{toEco(x*.1);S.fl.rez=1;next();}},
+       {l:'Nu pun nimic, văd la sfârșit de lună',f:next}]};
+}
+function mancare(){
+  const set=(m)=>()=>{S.mancare=m;next();};
+  return{t:'Cum mănânci în luna asta?',p:'<p>Alegerea se aplică în fiecare săptămână.</p>',
+    o:[{l:'Gătesc acasă (250 lei / săptămână)',f:set(250)},
+       {l:'Un pic și-un pic (380 lei / săptămână)',f:set(380)},
+       {l:'Comand des, nu am timp (550 lei / săptămână)',f:set(550)}]};
+}
+
+/* ----- închiderea săptămânii ----- */
+function closeW(n){
+  add(`Mâncare, săpt. ${n}`,-S.mancare);
+  add(`Facturi, săpt. ${n}`,-FACTURI_SAPT);
+  let extra='';
+  if(n===1){add('Abonament transport (lună)',-S.city.t);extra=`, transport ${fmt(S.city.t)}`;}
+  if(n===4){add('Chiria pentru luna următoare',-S.chirie);extra=`, chirie luna viitoare ${fmt(S.chirie)}`;}
+  S.w=Math.min(n+1,4);draw();
+  return{t:`Sfârșit de săptămâna ${n}`,
+    p:`<p>Mâncare ${fmt(S.mancare)}, facturi ${fmt(FACTURI_SAPT)}${extra}.</p><p>În cont: <b class="${S.bani<0?'n':''}">${fmt(S.bani)}</b></p>`,
+    o:[{l:'Continuă',f:()=>{if(S.bani<0)S.q.unshift(urgenta);next();},c:'go'}]};
+}
+function urgenta(){
+  const need=Math.ceil(-S.bani/100)*100+300;
+  const o=[];
+  if(S.eco>0){const u=Math.min(S.eco,need);o.push({l:`Folosesc fondul de rezervă (${fmt(u)})`,f:()=>{S.eco-=u;add('Bani din fondul de rezervă',u);next();}});}
+  o.push({l:`Cer ajutor familiei (${fmt(need)})`,f:()=>{S.fl.fam=1;add('Ajutor de la familie',need);next();}});
+  o.push({l:`Card de credit (${fmt(need)}, dobândă 20%)`,f:()=>{S.fl.credit=1;S.dat+=need*1.2;add('Retragere card de credit',need);next();}});
+  return{t:'Ai rămas fără bani',p:`<p>Contul e pe minus. Ai nevoie de cel puțin ${fmt(need)} ca să ajungi până la capăt. Ce faci?</p>`,o};
+}
+
+/* ----- săptămâna 2 ----- */
+function tentatie(){
+  return{t:'Un clip pe TikTok',
+    p:'<p>Un influencer spune că face „3.000 € pe lună din dropshipping, fără efort”. Cursul lui și primul stoc costă <b>500 lei</b>.</p>',
+    o:[{l:'Investesc 500 lei, merită riscul',f:()=>{S.fl.inv=1;add('Curs și stoc dropshipping',-500);next();}},
+       {l:'Mai întâi verific costurile reale',f:()=>{S.fl.ver=1;S.q.unshift(analiza);next();}},
+       {l:'Ignor clipul',f:()=>{S.fl.ver=1;next();}}]};
+}
+function analiza(){
+  return{t:'Verificarea promisiunii',
+    p:`<p>Ai făcut calculul înainte să plătești. Iată ce nu apărea în clip:</p>
+    <table><tr><td>Reclame plătite pe rețele</td><td>~300 lei</td></tr>
+    <tr><td>Retururi și produse stricate</td><td>~120 lei</td></tr>
+    <tr><td>Comision platformă</td><td>~60 lei</td></tr>
+    <tr><td>Impozit pe venit (10%)</td><td>din profit</td></tr>
+    <tr><td>Timp până la primele vânzări</td><td>2-3 săptămâni</td></tr></table>
+    <div class="tip">Majoritatea celor care încep nu își recuperează investiția în prima lună.</div>`,
+    o:[{l:'Renunț la ideea asta',f:next},
+       {l:'Tot investesc 500 lei, dar știu riscul',f:()=>{S.fl.inv=1;add('Curs și stoc dropshipping',-500);next();}}]};
+}
+
+/* ----- săptămâna 3 ----- */
+function sideRes(){
+  if(!S.fl.inv)return null;
+  if(Math.random()<.7){
+    const imp=42;
+    add('Vânzări dropshipping',900);add('Reclame, retururi, comision',-480);add('Impozit pe venit',-imp);
+    return{t:'Rezultatul side-hustle-ului',
+      p:`<p>Ai vândut ceva, dar uită-te la cifre:</p><table>
+      <tr><td>Vânzări</td><td>900 lei</td></tr><tr><td>Reclame, retururi, comision</td><td>−480 lei</td></tr>
+      <tr><td>Impozit (aprox.)</td><td>−${imp} lei</td></tr><tr><td><b>Intrat în cont</b></td><td><b>${fmt(900-480-imp)}</b></td></tr></table>
+      <div class="tip">Ai investit 500 lei și ai recuperat ${fmt(900-480-imp)}. Rezultat: −${fmt(500-(900-480-imp))}, plus ore de muncă.</div>`,
+      o:[{l:'Continuă',f:next,c:'go'}]};
+  }
+  return{t:'Rezultatul side-hustle-ului',
+    p:'<p>Reclamele nu au adus nicio vânzare. Cei 500 lei sunt pierduți.</p><div class="tip">Se întâmplă destul de des și nu apare în clipurile cu „bani rapizi”.</div>',
+    o:[{l:'Continuă',f:next,c:'go'}]};
+}
+function laptop(){
+  const o=[];
+  if(S.eco>=600)o.push({l:'Folosesc fondul de rezervă (600 lei)',f:()=>{S.eco-=600;S.log.unshift({d:'Reparație laptop (din fond)',a:-600,w:S.w});draw();S.fl.usedRez=1;next();}});
+  o.push({l:'Plătesc reparația din cont (600 lei)',f:()=>{add('Reparație laptop',-600);next();}});
+  o.push({l:'Laptop nou, în rate (800 lei acum, restul cu dobândă)',f:()=>{S.fl.credit=1;S.dat+=1600*1.15;add('Avans laptop nou',-800);next();}});
+  return{t:'Laptopul s-a stricat',p:'<p>Ai nevoie de el pentru muncă. Reparația costă 600 lei, iar un laptop nou 2.400 lei. Ce faci?</p>',o};
+}
+
+/* ----- săptămâna 4 ----- */
+function prieten(){
+  return{t:'Un prieten îți cere bani',p:'<p>Un prieten are nevoie de 500 lei „până la salariu”. Nu e sigur când ți-i dă înapoi.</p>',
+    o:[{l:'Îi dau 500 lei',f:()=>{S.fl.imp=1;add('Împrumut dat unui prieten',-500);next();}},
+       {l:'Îi dau 200 lei, cât îmi permit',f:()=>{add('Ajutor dat unui prieten',-200);next();}},
+       {l:'Refuz politicos',f:next}]};
+}
+function decizie(){
+  const o=[];
+  if(S.dat>0&&S.bani>0)o.push({l:'Plătesc datoriile cât pot',f:()=>{const p=Math.min(S.bani,S.dat);S.dat-=p;add('Plată datorii',-p);next();}});
+  if(S.bani>0)o.push({l:'Pun jumătate din bani în fondul de rezervă',f:()=>{toEco(Math.round(S.bani/2));next();}});
+  o.push({l:'Mă răsplătesc cu o ieșire și haine noi',f:()=>{if(S.bani>0)add('Ieșiri și haine',-Math.round(S.bani/2));next();}});
+  return{t:'Ultima decizie',p:`<p>Luna s-a încheiat. În cont ai <b>${fmt(S.bani)}</b>${S.dat>0?` și datorii de ${fmt(S.dat)}`:''}. Ce faci cu banii?</p>`,o};
+}
+
+/* ----- scorul final ----- */
+function final(){
+  const f=S.fl;let p=0;const ok=[],ko=[];
+  const r=(c,pts,y,n)=>{if(c){p+=pts;ok.push(y);}else ko.push(n);};
+  r(S.bani>=0,15,'Ai încheiat luna fără să fii pe minus.','Contul a ajuns pe minus. Fă un buget pe săptămână înainte să cheltui.');
+  r(S.dat===0,20,'Nu ai rămas cu datorii.','Ai rămas cu datorii. Dobânzile cresc rapid, plătește-le primele.');
+  r(S.eco>=1500,25,'Ai un fond de rezervă solid.','Fondul de rezervă e mic. Țintește cel puțin o chirie și jumătate.');
+  r(!!f.ver,15,'Ai verificat promisiunea de „bani rapizi” înainte să investești.','Ai investit fără să verifici costurile. Calculează costurile și taxele înainte.');
+  r(!f.fam&&!f.credit,15,'Nu ai avut nevoie de credit sau de ajutor.','Ai apelat la credit sau la familie. Un fond de rezervă te scutește de asta.');
+  r(!!f.rez,10,'Ai pus bani deoparte din prima zi.','Nu ai pus nimic deoparte din salariu.');
+  p=Math.max(0,Math.min(100,p));
+  const lbl=p>=85?'Legendă financiară':p>=65?'Adult pe bune':p>=40?'Ucenic al banilor':'Începător';const s=Math.round(p/20);
+  return{t:'Bilanțul lunii',
+    p:`<p class="score ${p>=50?'p':'n'}">${p}/100</p><p class="stars">${'★'.repeat(s)}${'☆'.repeat(5-s)}</p><p class="rank">${lbl}</p>
+    <p><b>Ce ai făcut bine</b></p><ul>${ok.map(x=>`<li>${x}</li>`).join('')||'<li>Încă nimic. Încearcă din nou.</li>'}</ul>
+    <p><b>Ce poți îmbunătăți</b></p><ul>${ko.map(x=>`<li>${x}</li>`).join('')||'<li>Nimic major.</li>'}</ul>
+    <div class="tip">Banii din joc erau fictivi. Cum ai fi decis cu banii tăi?</div>`,
+    o:[{l:'Joacă din nou',f:start,c:'go'}]};
+}
+
+start();
+</script>
+</body>
+</html>
