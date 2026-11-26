@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prima ta lună de adult · v2</title>
+<style>
+:root{--bg:#171433;--bg2:#221E4A;--card:#2A2560;--line:#443E9A;--ink:#F4F2FF;--mute:#A9A3D9;--blue:#5B8CFF;--mint:#38E0A1;--coral:#FF6B81;--sun:#FFC845;--shadow:#0E0B24}
+[data-theme="light"]{--bg:#F4F2FF;--bg2:#FFFFFF;--card:#EDE9FF;--line:#B9B2F0;--ink:#1A1533;--mute:#5C548A;--shadow:#C9C2F0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px;transition:background .3s,color .3s}
+.app{max-width:720px;margin:0 auto;padding:0 14px 40px}
+.top{padding:18px 4px 8px;position:relative}
+.top h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.3px}
+.top p{margin:2px 0 0;color:var(--mute);font-size:14px}
+.themeBtn{position:absolute;right:4px;top:18px;background:var(--card);border:2px solid var(--line);border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:18px;color:var(--ink);padding:0;display:grid;place-items:center}
+#hud{position:sticky;top:0;z-index:5;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin:8px 0 14px;display:grid;grid-template-columns:1fr auto;gap:8px 12px;box-shadow:0 6px 0 var(--shadow)}
+#hud:empty{display:none}
+.who{display:flex;gap:10px;align-items:center}
+.who small{display:block;color:var(--mute);font-size:12px}
+.who b{font-size:14px}
+.av{font-size:28px;background:var(--card);border-radius:12px;width:44px;height:44px;display:grid;place-items:center}
+.bal{text-align:right}
+.bal small{display:block;color:var(--mute);font-size:12px}
+.bal b{font-size:26px;font-weight:900;color:var(--mint);font-variant-numeric:tabular-nums}
+.bal b.n{color:var(--coral)}
+.chips{display:flex;gap:8px;font-size:14px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.chips span{background:var(--card);border-radius:20px;padding:2px 12px}
+.track{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;list-style:none;margin:2px 0 0;padding:0}
+.track li{background:var(--card);border-radius:10px;padding:4px 6px;text-align:center;font-weight:900;font-size:14px;color:var(--mute);border-bottom:4px solid transparent;transition:all .3s}
+.track small{display:block;font-weight:400;font-size:11px}
+.track li.done{color:var(--mint);border-color:var(--mint)}
+.track li.now{color:#2a1d00;background:var(--sun);border-color:#C79500;transform:scale(1.03)}
+.n{color:var(--coral)!important}
+.p{color:var(--mint)}
+#stage{background:var(--bg2);border:2px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 0 var(--shadow);position:relative}
+.scene{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.ic{font-size:36px;width:64px;height:64px;flex:none;border-radius:18px;background:var(--card);display:grid;place-items:center;border-bottom:4px solid var(--line)}
+h2{margin:0;font-size:24px;font-weight:900;line-height:1.2}
+.txt p{margin:0 0 10px}
+.opts{display:grid;gap:10px;margin-top:18px;counter-reset:o}
+button{font:inherit;text-align:left;padding:12px 14px;border:2px solid var(--line);border-bottom-width:5px;background:var(--card);color:var(--ink);border-radius:14px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:transform .1s,border-color .15s}
+.opts button::before{counter-increment:o;content:counter(o,upper-alpha);flex:none;width:28px;height:28px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-weight:900;font-size:13px;color:#fff}
+button:hover,button:focus-visible{border-color:var(--blue);transform:translateY(-2px);outline:2px solid var(--blue);outline-offset:2px}
+button:active{transform:translateY(2px);border-bottom-width:3px}
+button.go{background:var(--sun);border-color:#C79500;color:#2a1d00;font-weight:900;justify-content:center;text-align:center}
+button.go::before{display:none}
+label{display:block;margin:12px 0 4px;font-weight:700;color:var(--mute);font-size:14px}
+select,input{width:100%;font:inherit;padding:11px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin:8px 0;background:var(--card);border-radius:12px;overflow:hidden}
+td{padding:7px 12px;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.tip{background:rgba(255,200,69,.12);border-left:5px solid var(--sun);padding:8px 12px;margin:12px 0;border-radius:0 10px 10px 0}
+.tip.bad{background:rgba(255,107,129,.15);border-left-color:var(--coral)}
+.tip.good{background:rgba(56,224,161,.12);border-left-color:var(--mint)}
+.score{font-size:72px;font-weight:900;margin:0;line-height:1}
+.stars{font-size:28px;color:var(--sun);margin:4px 0;letter-spacing:2px}
+.rank{font-size:20px;font-weight:900}
+details{margin-top:16px;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:12px 16px}
+summary{cursor:pointer;font-weight:900;outline:none}
+#ledger{list-style:none;margin:10px 0 0;padding:0;max-height:340px;overflow:auto}
+#ledger li{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+#ledger small{display:block;color:var(--mute)}
+#ledger b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.toast{position:fixed;right:14px;top:130px;z-index:9;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:900;animation:t 2.4s forwards;pointer-events:none;font-variant-numeric:tabular-nums;box-shadow:0 6px 0 var(--shadow)}
+@keyframes t{0%{opacity:0;transform:translateY(10px)}12%,80%{opacity:1;transform:none}100%{opacity:0}}
+.note{font-size:12px;color:var(--mute);text-align:center;padding:14px 8px}
+.bars{grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:13px;flex-wrap:wrap}
+.bars i,.fb i{flex:1;min-width:60px;height:8px;background:var(--card);border-radius:8px;overflow:hidden;position:relative}
+.bars u,.fb u{display:block;height:100%;background:var(--blue);transition:width .5s ease}
+.fb{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:14px}
+.fb span{width:130px;flex:none}
+.fb b{width:32px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+.ad{background:var(--card);padding:14px;border-radius:14px;font-size:17px;line-height:2}
+.fl{border-bottom:2px dashed var(--mute);cursor:pointer;padding:0 2px;user-select:none}
+.fl.on{background:var(--coral);color:#fff;border-radius:4px}
+.tbw{height:8px;background:var(--card);border-radius:8px;margin:0 0 12px;overflow:hidden}
+.tb{height:100%;width:100%;background:var(--mint);transition:width .1s linear}
+.tb.hot{background:var(--coral)}
+.flash{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:20;background:var(--coral);color:#fff;font-weight:900;padding:12px 18px;border-radius:14px;max-width:92vw;box-shadow:0 6px 0 #7a1c28}
+.shake{animation:sk .5s}
+@keyframes sk{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+body.stress{box-shadow:inset 0 0 90px rgba(255,107,129,.4)}
+.flash.alert{background:var(--sun);color:#2a1d00;box-shadow:0 6px 0 #8a6200}
+.lowbar{grid-column:1/-1;background:rgba(255,107,129,.2);border:2px solid var(--coral);border-radius:10px;padding:4px 10px;font-weight:700;font-size:14px;animation:pl 1.2s infinite alternate}
+@keyframes pl{to{background:rgba(255,107,129,.45)}}
+.badges-wrap{display:flex;flex-wrap:wrap;margin:8px 0}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:6px 12px;margin:4px 4px 0 0;font-size:13px;font-weight:700}
+.badge.new{animation:pop .5s}
+@keyframes pop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn-row button{flex:1;min-width:140px;justify-content:center;text-align:center}
+.btn-row button::before{display:none}
+@media(prefers-reduced-motion:reduce){.toast,.flash,.shake,.track li.now,.badge.new{animation:none!important}button,.bars u,.fb u,.tb{transition:none!important}}
+@media(max-width:480px){.top h1{font-size:22px}h2{font-size:20px}.ic{width:52px;height:52px;font-size:28px}#stage{padding:16px}.bal b{font-size:22px}.fb span{width:100px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <h1>Prima ta lună de adult</h1>
+    <p>Liceul s-a terminat. Banii, jobul și orașul sunt acum ale tale. Ai 4 săptămâni.</p>
+    <button class="themeBtn" id="themeBtn" aria-label="Schimbă tema" title="Temă">🌙</button>
+  </div>
+  <div id="hud" role="status" aria-live="polite"></div>
+  <main id="stage" role="main"></main>
+  <details open><summary>Extrasul tău de cont</summary><ul id="ledger"></ul></details>
+  <p class="note">Joc educațional cu bani fictivi. Cifrele sunt orientative; verifică taxele actuale pe anaf.ro.</p>
+</div>
+
+<script>
+/* ===== 1. DATE ===== */
+const CAT={
+'💻 IT':'Dezvoltator software:6500,Tester QA:5000,Analist date:5500,Administrator rețea:5000,Designer UX:5200,Specialist securitate cibernetică:6200,Suport IT:3800,Dezvoltator de jocuri:5300,Inginer DevOps:7000',
+'🩺 Sănătate':'Asistent medical:4500,Medic rezident:5500,Farmacist:5000,Kinetoterapeut:4300,Asistent stomatologic:3800,Tehnician radiologie:4300,Infirmier:3500,Psiholog:4200,Nutriționist:4000,Paramedic:4600',
+'🔧 Meserii':'Electrician:5000,Instalator:4800,Sudor:5200,Tâmplar:4300,Mecanic auto:4500,Zidar:4500,Zugrav:4000,Frizer:3600,Tehnician HVAC:5000,Șofer de camion:5500,Lăcătuș mecanic:4400,Operator CNC:4800,Montator panouri solare:4700',
+'📊 Birou și finanțe':'Contabil junior:4200,Asistent administrativ:3700,Analist financiar:5500,Agent de asigurări:4000,Specialist HR:4300,Specialist marketing:4600,Content creator:4000,Agent de vânzări:4000,Casier bancar:4200,Auditor junior:5000,Logistician:4300',
+'🍳 Servicii':'Bucătar:4200,Ospătar:3500,Barista:3300,Recepționer hotel:3600,Ghid turistic:3600,Însoțitor de zbor:5500,Agent de turism:3800,Bartender:3700,Cofetar:3800,Brutar:3600,Cameristă:3300',
+'🎓 Educație și social':'Profesor:4800,Educatoare:3800,Asistent social:3800,Bibliotecar:3400,Antrenor sportiv:3800,Instructor auto:4000,Traducător:4300',
+'🎨 Creativ':'Designer grafic:4800,Fotograf:3800,Editor video:4300,Arhitect junior:5000,Designer de interior:4500,Jurnalist:4000,Profesor de muzică:3600,Actor:3600,Ilustrator:3800,Social media manager:4200',
+'🏭 Industrie și inginerie':'Inginer mecanic:5800,Inginer electronist:5800,Inginer constructor:6000,Topograf:4600,Tehnician mentenanță:4500,Operator producție:3600,Controlor calitate:4000,Tehnician telecom:4600,Electronist auto:4300',
+'🛡️ Siguranță și public':'Polițist:5000,Pompier:4800,Jandarm:4600,Militar:5000,Agent de pază:3400,Vameș:4500,Funcționar public:4300',
+'🌱 Natură și transport':'Fermier:3600,Agronom:4500,Silvicultor:4000,Medic veterinar:5000,Grădinar peisagist:3800,Curier:4000,Livrator:3800,Magazioner:3600,Vânzător:3500,Șofer ride-sharing:4200'
+};
+const MIN_BRUT=4325;
+const JOBS=Object.entries(CAT).flatMap(([k,s])=>s.split(',').map(x=>{const[n,b]=x.split(':');return{n,b:Math.max(+b,MIN_BRUT),e:k.split(' ')[0],c:k.slice(k.indexOf(' ')+1)}}));
+const BURSA=600,FAMILIE=500,STUD={n:'Student',b:Math.round(MIN_BRUT/2),e:'🎓',c:'Facultate'},STUDNET=Math.round(STUD.b*.585)+BURSA+FAMILIE;
+const JOBONLY=new Set(['Ore suplimentare','Bonus neașteptat','Un coleg te critică','Cină cu colegii']);
+const FACONLY=new Set(['Sesiunea','Cărți și cursuri','Job part-time','Cerere de bursă','Mese și ieșiri','Abonament de student','Laptop pentru facultate','Petrecere după examene']);
+const ld=k=>{try{return JSON.parse(localStorage.getItem('ptla_'+k));}catch(e){return null;}};
+const sv=(k,v)=>{try{localStorage.setItem('ptla_'+k,JSON.stringify(v));}catch(e){}};
+const cl=v=>Math.max(0,Math.min(100,Math.round(v)));
+const shuffle=a=>{const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;};
+
+const EV=[
+['🎤','Concertul','Prietenii merg la un concert. Biletul costă 350 de lei.',[['Merg cu ei',{b:-350,r:10,e:5},'O seară de neuitat. Banii s-au dus, dar legăturile s-au întărit.'],['Rămân acasă',{r:-8,e:4},'Te-ai odihnit, dar ai pierdut o seară cu ei.'],['Propun un film acasă',{b:-40,r:6},'Aproape aceeași distracție, cu 300 lei mai puțin.']]],
+['📚','Curs online','Un curs cu certificat în domeniul tău costă 300 lei.',[['Mă înscriu',{b:-300,k:15,e:-5},'Ai primit certificatul. Poate crește salariul pe viitor.'],['Caut unul gratuit',{k:8,e:-5},'Mai lent, dar fără cost.'],['Nu am timp',{k:-3},'Nimic nu s-a schimbat.']]],
+['🤧','Te-ai răcit','Ai febră și nu te poți concentra la muncă.',[['Merg la medic (120 de lei)',{b:-120,e:10},'Tratat la timp, te-ai refăcut repede.'],['Merg la muncă oricum',{e:-15},'Ai lucrat prost și ai stat bolnav mai mult.'],['Mă odihnesc acasă (60 de lei)',{b:-60,e:6},'Două zile și ești bine.']]],
+['📱','Ecranul telefonului','Ți-a căzut telefonul și ecranul s-a spart.',[['Îl repar (400 lei)',{b:-400,e:2},'Merge ca nou.'],['Îl folosesc așa',{e:-5,k:-2},'Te enervezi zilnic și ratezi notificări.'],['Cumpăr unul nou (2.500 lei)',{b:-2500,e:4},'Frumos, dar a durut contul.']]],
+['👩','Ziua mamei','Mama ta împlinește ani.',[['Cumpăr un cadou (150 de lei)',{b:-150,r:12},'Mama e foarte fericită.'],['Doar o sun',{r:4},'A apreciat, dar a sperat la mai mult.'],['Uit',{r:-12},'A fost supărată.']]],
+['🛍️','Black Friday','Magazinul preferat dă reduceri de 50%.',[['Cumpăr tot ce vreau (600 lei)',{b:-600,e:3},'Ai dulapul plin și contul gol.'],['Iau un singur lucru (150 de lei)',{b:-150,e:2},'O alegere cumpătată.'],['Ignor oferta',{k:3},'Banii rămân la tine.']]],
+['⏱️','Ore suplimentare','Șeful îți propune ore în plus, plătite cu 400 lei.',[['Accept',{b:400,e:-15,r:-3},'Banii intră, dar ești obosit.'],['Refuz politicos',{e:5},'Ți-ai păstrat energia.'],['Cer mentorat în loc de bani',{k:12,e:-5},'Ai învățat mult de la colegul senior.']]],
+['🏠','Chiria crește','Proprietarul vrea 150 de lei în plus pe lună.',[['Accept',{b:-150},'Ai evitat conflictul.'],['Negociez calm',{b:-50,k:6},'Ai ajuns la un compromis.'],['Mă mut',{b:-600,e:-10},'Mutarea înseamnă transport, cutii, o nouă garanție și zile pierdute.']]],
+['🔁','Abonamente uitate','Verifici extrasul și vezi 3 abonamente uitate, 90 de lei în total.',[['Le anulez',{k:5},'Ai oprit pierderea.'],['Las așa, nu mă deranjează',{b:-90},'Banii se duc lună de lună.']]],
+['🏃','Sănătate','Simți că ți-ai pierdut forma.',[['Mă înscriu la sală (120 de lei)',{b:-120,e:12},'Te simți mai bine, la un preț rezonabil.'],['Alerg gratuit în parc',{e:8},'La fel de bun, fără cost.'],['Nu fac nimic',{e:-5},'Oboseala se adună.']]],
+['🚌','Greva transportului','Greva blochează transportul și trebuie să ajungi la muncă.',[['Iau taxi (80 de lei)',{b:-80,e:3},'Ai ajuns la timp, dar a costat.'],['Merg pe jos o oră',{e:-8},'Ai ajuns obosit, dar fără niciun cost.'],['Îmi iau zi liberă',{k:-3,e:6},'Te-ai odihnit, dar ai rămas în urmă cu munca.']]],
+['🎁','Bonus neașteptat','Firma îți dă 300 lei bonus.',[['Îl las în cont',{b:300,e:3},'Un mic avans pentru luna asta.'],['Îl cheltui pe o ieșire',{r:8,e:5},'Te-ai distrat, iar banii s-au dus.'],['Îl folosesc pentru un curs',{b:150,k:10},'Ai investit în tine și ți-au rămas 150 de lei.']]],
+['👟','Pantofii s-au rupt','Ți-ai rupt pantofii înainte de o zi importantă.',[['Iau unii ieftini (120 de lei)',{b:-120},'Rezolvat, fără bătăi de cap.'],['Iau unii de marcă (500 lei)',{b:-500,r:2},'Arată bine, dar au costat enorm.'],['Îi lipesc și merg',{r:-4,e:-3},'Ai fost jenat toată ziua.']]],
+['💬','Un coleg te critică','Un coleg îți spune că ai greșit într-o sarcină.',[['Ascult și corectez',{k:8,e:-3},'Ai învățat din greșeală.'],['Mă supăr și nu-i mai vorbesc',{r:-8},'Atmosfera la birou s-a răcit.'],['Îi cer exemple concrete',{k:12},'Ai primit sfaturi utile.']]],
+['🍕','Cină cu colegii','Colegii te invită la cină. Costă 150 de lei.',[['Merg și comand ce vreau',{b:-150,r:10},'Te-ai apropiat de echipă.'],['Merg, dar comand ceva ieftin (40 de lei)',{b:-40,r:6},'Ai ieșit cu ei, fără să-ți golești contul.'],['Refuz',{r:-6},'Ai pierdut o ocazie de a lega prietenii.']]],
+['🔌','Factura la curent','Factura de curent a ieșit cu 120 de lei mai mare decât de obicei.',[['O plătesc și reduc consumul',{b:-120,k:5},'Ai învățat ce consumă mult.'],['O plătesc fără să mă gândesc',{b:-120},'Banii se duc fără să înțelegi de ce.'],['Contest factura',{b:-60,k:8,e:-3},'Ai primit o reducere după câteva telefoane.']]],
+['📩','Mesaj de la „bancă”','Primești un SMS: „Contul tău a fost blocat. Intră pe link și confirmă datele cardului în 10 minute.”',[['Dau clic și introduc datele',{b:-700,e:-12,k:-3},'Era phishing. Escrocii ți-au golit o parte din cont. Banca nu cere niciodată datele cardului prin link.'],['Sun banca la numărul de pe card',{k:12,e:2},'Banca a confirmat că mesajul era fals. Verifică mereu prin canalele oficiale.'],['Șterg mesajul',{k:5},'Ai evitat capcana, dar nu ai avertizat pe nimeni.']]],
+['📈','Prețurile cresc','La supermarket, același coș de cumpărături costă acum cu 60 de lei mai mult decât luna trecută.',[['Accept și plătesc',{b:-60},'Inflația îți mănâncă puterea de cumpărare fără să observi.'],['Compar prețurile și schimb magazinul',{b:-20,k:8},'Ai limitat scumpirea prin comparație.'],['Cumpăr doar de la brandurile mele preferate',{b:-90,e:1},'Loialitatea față de brand te costă mai mult.']]],
+['📝','Contract de închiriere','Proprietarul spune: „Ne înțelegem din vorbă, fără contract, e mai simplu și mai ieftin pentru amândoi.”',[['Accept fără contract',{b:-200,k:-3,e:-5},'Fără contract nu ai nicio dovadă a garanției și poți fi dat afară oricând.'],['Cer contract scris și înregistrat (30 de lei)',{b:-30,k:12},'Acum ai drepturi clare: preț, durată, garanție.'],['Caut altă locuință',{b:-80,e:-6,k:5},'Ai pierdut timp, dar nu ai riscat.']]],
+['📖','Sesiunea','Începe sesiunea și ai trei examene în două săptămâni.',[['Învăț puțin în fiecare zi',{e:-8,k:15},'Efortul constant dă rezultate, iar stresul rămâne mic.'],['Învăț totul în ultima noapte',{e:-20,k:4},'Ai trecut la limită și ești epuizat.'],['Las un examen pentru restanță (150 de lei)',{b:-150,k:2},'Taxa de restanță costă, iar problema doar se amână.']]],
+['📚','Cărți și cursuri','Un profesor recomandă trei cărți, care costă 200 de lei în total.',[['Le cumpăr noi',{b:-200,k:8},'Le ai pentru totdeauna, dar costă.'],['Cumpăr second-hand (70 de lei)',{b:-70,k:8},'Aceleași informații, la un preț mult mai mic.'],['Le împrumut de la bibliotecă',{k:8,e:-3},'Gratuit, dar trebuie să respecți termenul de returnare.']]],
+['💼','Job part-time','Șeful îți propune 8 ore în plus pe săptămână, cu 200 de lei în plus.',[['Accept',{b:200,e:-12,k:-3},'Banii intră, dar ai mai puțin timp pentru învățat.'],['Refuz politicos',{e:4,k:4},'Ți-ai protejat timpul de studiu.'],['Cer program flexibil',{b:100,e:-5},'Compromis bun: mai mulți bani, dar fără exces.']]],
+['📝','Cerere de bursă','Poți cere o bursă suplimentară, dar trebuie să strângi acte, ceea ce costă 50 de lei și două zile.',[['Depun actele',{b:450,e:-6,k:5},'Ai primit bursa: bani care altfel s-ar fi pierdut.'],['Întreb colegii mai mari cum se face',{b:450,e:-4,k:10},'Ai evitat greșelile și ai primit bursa.'],['Nu mai depun, e prea complicat',{k:-3},'Ai pierdut o sursă de venit.']]],
+['🍝','Mese și ieșiri','Cantina costă 15 lei o masă, iar prietenii vor să mergi la restaurant (70 de lei).',[['Restaurant cu ei',{b:-70,r:8},'Te-ai distrat, dar a costat mult.'],['Cantina (15 lei)',{b:-15,r:2},'Ai mâncat ieftin, dar ai ratat distracția.'],['Gătesc în cămin și îi invit (25 de lei)',{b:-25,r:8,k:3},'Ai ieșit cu prietenii la un cost foarte mic.']]],
+['🚌','Abonament de student','Poți lua un abonament redus pentru studenți (60 de lei) sau bilete simple (cam 120 de lei pe lună).',[['Abonament de student',{b:-60,k:6},'Reducerea pentru studenți te-a scutit de bani.'],['Bilete simple',{b:-120},'Ai plătit prețul întreg fără motiv.'],['Merg pe jos și cu bicicleta',{e:4},'Ai economisit și te-ai mișcat, dar pierzi timp.']]],
+['💻','Laptop pentru facultate','Laptopul tău nu mai face față proiectelor. Unul second-hand costă 1
