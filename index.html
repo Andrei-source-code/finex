@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prima ta lună de adult</title>
+<style>
+:root{--bg:#171433;--bg2:#221E4A;--card:#2A2560;--line:#443E9A;--ink:#F4F2FF;--mute:#A9A3D9;--blue:#5B8CFF;--mint:#38E0A1;--coral:#FF6B81;--sun:#FFC845}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px}
+.app{max-width:680px;margin:0 auto;padding:0 14px 30px}
+.top{padding:18px 4px 8px}.top h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.3px}.top p{margin:2px 0 0;color:var(--mute);font-size:14px}
+#hud{position:sticky;top:0;z-index:5;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin:8px 0 14px;display:grid;grid-template-columns:1fr auto;gap:8px 12px;box-shadow:0 6px 0 #0E0B24}
+#hud:empty{display:none}
+.who{display:flex;gap:10px;align-items:center}.who small{display:block;color:var(--mute);font-size:12px}.who b{font-size:14px}
+.av{font-size:28px;background:var(--card);border-radius:12px;width:44px;height:44px;display:grid;place-items:center}
+.bal{text-align:right}.bal small{display:block;color:var(--mute);font-size:12px}
+.bal b{font-size:26px;font-weight:900;color:var(--mint);font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}.chips span{background:var(--card);border-radius:20px;padding:2px 12px}
+.track{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;list-style:none;margin:2px 0 0;padding:0}
+.track li{background:var(--card);border-radius:10px;padding:4px 6px;text-align:center;font-weight:900;font-size:14px;color:var(--mute);border-bottom:4px solid transparent}
+.track small{display:block;font-weight:400;font-size:11px}
+.track li.done{color:var(--mint);border-color:var(--mint)}.track li.now{color:#2a1d00;background:var(--sun);border-color:#C79500}
+.n{color:var(--coral)!important}.p{color:var(--mint)}
+#stage{background:var(--bg2);border:2px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 0 #0E0B24}
+.scene{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.ic{font-size:36px;width:64px;height:64px;flex:none;border-radius:18px;background:var(--card);display:grid;place-items:center;border-bottom:4px solid var(--line)}
+h2{margin:0;font-size:24px;font-weight:900;line-height:1.2}
+.txt p{margin:0 0 10px}
+.opts{display:grid;gap:10px;margin-top:18px;counter-reset:o}
+button{font:inherit;text-align:left;padding:12px 14px;border:2px solid var(--line);border-bottom-width:5px;background:var(--card);color:var(--ink);border-radius:14px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:transform .1s}
+.opts button::before{counter-increment:o;content:counter(o,upper-alpha);flex:none;width:28px;height:28px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-weight:900;font-size:13px}
+button:hover,button:focus-visible{border-color:var(--blue);transform:translateY(-2px);outline:none}
+button:active{transform:translateY(2px);border-bottom-width:3px}
+button.go{background:var(--sun);border-color:#C79500;color:#2a1d00;font-weight:900;justify-content:center;text-align:center}
+button.go::before{display:none}
+label{display:block;margin:12px 0 4px;font-weight:700;color:var(--mute);font-size:14px}
+select{width:100%;font:inherit;padding:11px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+table{width:100%;border-collapse:collapse;margin:8px 0;background:var(--card);border-radius:12px}
+td{padding:7px 12px;border-bottom:1px solid var(--line)}td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.tip{background:rgba(255,200,69,.12);border-left:5px solid var(--sun);padding:8px 12px;margin:12px 0;border-radius:0 10px 10px 0}
+.score{font-size:72px;font-weight:900;margin:0;line-height:1}.stars{font-size:28px;color:var(--sun);margin:4px 0}
+.rank{font-size:20px;font-weight:900}
+details{margin-top:16px;background:var(--bg2);border:2px solid var(--line);border-radius:16px;padding:12px 16px}
+summary{cursor:pointer;font-weight:900}
+#ledger{list-style:none;margin:10px 0 0;padding:0;max-height:340px;overflow:auto}
+#ledger li{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+#ledger small{display:block;color:var(--mute)}#ledger b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.toast{position:fixed;right:14px;top:130px;z-index:9;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:900;animation:t 2.4s forwards;pointer-events:none;font-variant-numeric:tabular-nums}
+@keyframes t{0%{opacity:0;transform:translateY(10px)}12%,80%{opacity:1;transform:none}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.toast{animation:none}button{transition:none}}
+.note{font-size:12px;color:var(--mute);text-align:center;padding:14px 8px}
+.bars{grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:13px}.bars i,.fb i{flex:1;height:8px;background:var(--card);border-radius:8px;overflow:hidden}.bars u,.fb u{display:block;height:100%;background:var(--blue);transition:width .4s}.fb{display:flex;gap:8px;align-items:center;margin:6px 0}.fb span{width:120px}.fb b{width:30px;text-align:right}.ad{background:var(--card);padding:14px;border-radius:14px;font-size:17px;line-height:2}.fl{border-bottom:2px dashed var(--mute);cursor:pointer;padding:0 2px}.fl.on{background:var(--coral);color:#fff;border-radius:4px}
+input{width:100%;font:inherit;padding:11px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.tbw{height:8px;background:var(--card);border-radius:8px;margin:0 0 12px;overflow:hidden}.tb{height:100%;width:100%;background:var(--mint)}.tb.hot{background:var(--coral)}
+.tip.bad{background:rgba(255,107,129,.15);border-left-color:var(--coral)}
+.flash{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:20;background:var(--coral);color:#fff;font-weight:900;padding:12px 18px;border-radius:14px;max-width:92vw;box-shadow:0 6px 0 #7a1c28}
+.shake{animation:sk .5s}@keyframes sk{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+body.stress{box-shadow:inset 0 0 90px rgba(255,107,129,.4)}
+@media(prefers-reduced-motion:reduce){.shake{animation:none}}
+.flash.alert{background:var(--sun);color:#2a1d00;box-shadow:0 6px 0 #8a6200}
+.lowbar{grid-column:1/-1;background:rgba(255,107,129,.2);border:2px solid var(--coral);border-radius:10px;padding:4px 10px;font-weight:700;font-size:14px;animation:pl 1.2s infinite alternate}
+@keyframes pl{to{background:rgba(255,107,129,.45)}}
+@media(prefers-reduced-motion:reduce){.lowbar{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><h1>Prima ta lună de adult</h1><p>Liceul s-a terminat. Banii, jobul și orașul sunt acum ale tale. Ai 4 săptămâni.</p></div>
+  <div id="hud"></div>
+  <main id="stage"></main>
+  <details open><summary>Extrasul tău de cont</summary><ul id="ledger"></ul></details>
+  <p class="note">Joc educațional cu bani fictivi. Cifrele sunt orientative; verifică taxele actuale pe anaf.ro.</p>
+</div>
+
+<script>
+/* ===== 1. DATELE JOCULUI: modifică aici cifrele ===== */
+const CAT={
+'💻 IT':'Dezvoltator software:6500,Tester QA:5000,Analist date:5500,Administrator rețea:5000,Designer UX:5200,Specialist securitate cibernetică:6200,Suport IT:3800,Dezvoltator de jocuri:5300,Inginer DevOps:7000',
+'🩺 Sănătate':'Asistent medical:4500,Medic rezident:5500,Farmacist:5000,Kinetoterapeut:4300,Asistent stomatologic:3800,Tehnician radiologie:4300,Infirmier:3500,Psiholog:4200,Nutriționist:4000,Paramedic:4600',
+'🔧 Meserii':'Electrician:5000,Instalator:4800,Sudor:5200,Tâmplar:4300,Mecanic auto:4500,Zidar:4500,Zugrav:4000,Frizer:3600,Tehnician HVAC:5000,Șofer de camion:5500,Lăcătuș mecanic:4400,Operator CNC:4800,Montator panouri solare:4700',
+'📊 Birou și finanțe':'Contabil junior:4200,Asistent administrativ:3700,Analist financiar:5500,Agent de asigurări:4000,Specialist HR:4300,Specialist marketing:4600,Content creator:4000,Agent de vânzări:4000,Casier bancar:4200,Auditor junior:5000,Logistician:4300',
+'🍳 Servicii':'Bucătar:4200,Ospătar:3500,Barista:3300,Recepționer hotel:3600,Ghid turistic:3600,Însoțitor de zbor:5500,Agent de turism:3800,Bartender:3700,Cofetar:3800,Brutar:3600,Cameristă:3300',
+'🎓 Educație și social':'Profesor:4800,Educatoare:3800,Asistent social:3800,Bibliotecar:3400,Antrenor sportiv:3800,Instructor auto:4000,Traducător:4300',
+'🎨 Creativ':'Designer grafic:4800,Fotograf:3800,Editor video:4300,Arhitect junior:5000,Designer de interior:4500,Jurnalist:4000,Profesor de muzică:3600,Actor:3600,Ilustrator:3800,Social media manager:4200',
+'🏭 Industrie și inginerie':'Inginer mecanic:5800,Inginer electronist:5800,Inginer constructor:6000,Topograf:4600,Tehnician mentenanță:4500,Operator producție:3600,Controlor calitate:4000,Tehnician telecom:4600,Electronist auto:4300',
+'🛡️ Siguranță și public':'Polițist:5000,Pompier:4800,Jandarm:4600,Militar:5000,Agent de pază:3400,Vameș:4500,Funcționar public:4300',
+'🌱 Natură și transport':'Fermier:3600,Agronom:4500,Silvicultor:4000,Medic veterinar:5000,Grădinar peisagist:3800,Curier:4000,Livrator:3800,Magazioner:3600,Vânzător:3500,Șofer ride-sharing:4200'
+};
+const MIN_BRUT=4325; // salariul minim brut pe economie, din 1 iulie 2026
+const JOBS=Object.entries(CAT).flatMap(([k,s])=>s.split(',').map(x=>{const[n,b]=x.split(':');return{n,b:Math.max(+b,MIN_BRUT),e:k.split(' ')[0],c:k.slice(k.indexOf(' ')+1)}}));
+const cl=v=>Math.max(0,Math.min(100,Math.round(v)));
+const shuffle=a=>a.sort(()=>Math.random()-.5);
+// b=bani, e=energie, r=relații, k=cunoștințe
+const EV=[
+['🎤','Concertul','Prietenii merg la un concert. Biletul costă 350 lei.',[['Merg cu ei',{b:-350,r:10,e:5},'O seară de neuitat. Banii s-au dus, dar legăturile s-au întărit.'],['Rămân acasă',{r:-8,e:4},'Te-ai odihnit, dar ai pierdut o seară cu ei.'],['Propun un film acasă',{b:-40,r:6},'Aproape aceeași distracție, cu 300 lei mai puțin.']]],
+['📚','Curs online','Un curs cu certificat în domeniul tău costă 300 lei.',[['Mă înscriu',{b:-300,k:15,e:-5},'Ai primit certificatul. Poate crește salariul pe viitor.'],['Caut unul gratuit',{k:8,e:-5},'Mai lent, dar fără cost.'],['Nu am timp',{k:-3},'Nimic nu s-a schimbat.']]],
+['🤧','Te-ai răcit','Ai febră și nu te poți concentra la muncă.',[['Merg la medic (120 lei)',{b:-120,e:10},'Tratat la timp, te-ai refăcut repede.'],['Merg la muncă oricum',{e:-15},'Ai lucrat prost și ai stat bolnav mai mult.'],['Mă odihnesc acasă (60 lei)',{b:-60,e:6},'Două zile și ești bine.']]],
+['📱','Ecranul telefonului','Ți-a căzut telefonul și ecranul s-a spart.',[['Îl repar (400 lei)',{b:-400,e:2},'Merge ca nou.'],['Îl folosesc așa',{e:-5,k:-2},'Te enervezi zilnic și ratezi notificări.'],['Cumpăr unul nou (2.500 lei)',{b:-2500,e:4},'Frumos, dar a durut contul.']]],
+['👩','Ziua mamei','Mama ta împlinește ani.',[['Cumpăr un cadou (150 lei)',{b:-150,r:12},'Mama e foarte fericită.'],['Doar o sun',{r:4},'A apreciat, dar a sperat la mai mult.'],['Uit',{r:-12},'A fost supărată.']]],
+['🛍️','Black Friday','Magazinul preferat dă reduceri de 50%.',[['Cumpăr tot ce vreau (600 lei)',{b:-600,e:3},'Ai dulapul plin și contul gol.'],['Iau un singur lucru (150 lei)',{b:-150,e:2},'O alegere cumpătată.'],['Ignor oferta',{k:3},'Banii rămân la tine.']]],
+['⏱️','Ore suplimentare','Șeful îți propune ore în plus, plătite cu 400 lei.',[['Accept',{b:400,e:-15,r:-3},'Banii intră, dar ești obosit.'],['Refuz politicos',{e:5},'Ți-ai păstrat energia.'],['Cer mentorat în loc de bani',{k:12,e:-5},'Ai învățat mult de la colegul senior.']]],
+['🏠','Chiria crește','Proprietarul vrea 150 lei în plus pe lună.',[['Accept',{b:-150},'Ai evitat conflictul.'],['Negociez calm',{b:-50,k:6},'Ai ajuns la un compromis.'],['Mă mut',{b:-600,e:-10},'Mutarea înseamnă transport, cutii, o nouă garanție și zile pierdute.']]],
+['🔁','Abonamente uitate','Verifici extrasul și vezi 3 abonamente uitate, 90 lei în total.',[['Le anulez',{k:5},'Ai oprit pierderea.'],['Las așa, nu mă deranjează',{b:-90},'Banii se duc lună de lună.']]],
+['🏃','Sănătate','Simți că ți-ai pierdut forma.',[['Mă înscriu la sală (120 lei)',{b:-120,e:12},'Te simți mai bine, la un preț rezonabil.'],['Alerg gratuit în parc',{e:8},'La fel de bun, fără cost.'],['Nu fac nimic',{e:-5},'Oboseala se adună.']]],
+['🚌','Greva transportului','Greva blochează transportul și trebuie să ajungi la muncă.',[['Iau taxi (80 lei)',{b:-80,e:3},'Ai ajuns la timp, dar a costat.'],['Merg pe jos o oră',{e:-8},'Ai ajuns obosit, dar fără niciun cost.'],['Îmi iau zi liberă',{k:-3,e:6},'Te-ai odihnit, dar ai rămas în urmă cu munca.']]],
+['🎁','Bonus neașteptat','Firma îți dă 300 lei bonus.',[['Îl las în cont',{b:300,e:3},'Un mic avans pentru luna asta.'],['Îl cheltui pe o ieșire',{r:8,e:5},'Te-ai distrat, iar banii s-au dus.'],['Îl folosesc pentru un curs',{b:150,k:10},'Ai investit în tine și ți-au rămas 150 lei.']]],
+['👟','Pantofii s-au rupt','Ți s-au rupt pantofii înainte de o zi importantă.',[['Iau unii ieftini (120 lei)',{b:-120},'Rezolvat, fără bătăi de cap.'],['Iau unii de marcă (500 lei)',{b:-500,r:2},'Arată bine, dar au costat enorm.'],['Îi lipesc și merg',{r:-4,e:-3},'Ai fost jenat toată ziua.']]],
+['💬','Un coleg te critică','Un coleg îți spune că ai greșit într-o sarcină.',[['Ascult și corectez',{k:8,e:-3},'Ai învățat din greșeală.'],['Mă supăr și nu-i mai vorbesc',{r:-8},'Atmosfera la birou s-a răcit.'],['Îi cer exemple concrete',{k:12},'Ai primit sfaturi utile.']]],
+['🍕','Cină cu colegii','Colegii te invită la cină. Costă 150 lei.',[['Merg și comand ce vreau',{b:-150,r:10},'Te-ai apropiat de echipă.'],['Merg, dar comand ceva ieftin (40 lei)',{b:-40,r:6},'Ai ieșit cu ei, fără să-ți golești contul.'],['Refuz',{r:-6},'Ai pierdut o ocazie de a lega prietenii.']]],
+['🔌','Factura la curent','Factura de curent a ieșit cu 120 lei mai mare decât de obicei.',[['O plătesc și reduc consumul',{b:-120,k:5},'Ai învățat ce consumă mult.'],['O plătesc fără să mă gândesc',{b:-120},'Banii se duc fără să înțelegi de ce.'],['Contest factura',{b:-60,k:8,e:-3},'Ai primit o reducere după câteva telefoane.']]],
+['📩','Mesaj de la „bancă”','Primești un SMS: „Contul tău a fost blocat. Intră pe link și confirmă datele cardului în 10 minute.”',[['Dau click și introduc datele',{b:-700,e:-12,k:-3},'Era phishing. Escrocii ți-au golit o parte din cont. Banca nu cere niciodată datele cardului prin link.'],['Sun banca la numărul de pe card',{k:12,e:2},'Banca a confirmat că mesajul era fals. Verifică mereu prin canalele oficiale.'],['Șterg mesajul',{k:5},'Ai evitat capcana, dar nu ai avertizat pe nimeni.']]],
+['📈','Prețurile cresc','La supermarket, același coș de cumpărături costă acum cu 60 lei mai mult decât luna trecută.',[['Accept și plătesc',{b:-60},'Inflația îți mănâncă puterea de cumpărare fără să observi.'],['Compar prețurile și schimb magazinul',{b:-20,k:8},'Ai limitat scumpirea prin comparație.'],['Cumpăr doar de la brandurile mele preferate',{b:-90,e:1},'Loialitatea față de brand te costă mai mult.']]],
+['📝','Contract de închiriere','Proprietarul spune: „Ne înțelegem din vorbă, fără contract, e mai simplu și mai ieftin pentru amândoi.”',[['Accept fără contract',{b:-200,k:-3,e:-5},'Fără contract nu ai nicio dovadă a garanției și poți fi dat afară oricând.'],['Cer contract scris și înregistrat (30 lei)',{b:-30,k:12},'Acum ai drepturi clare: preț, durată, garanție.'],['Caut altă locuință',{b:-80,e:-6,k:5},'Ai pierdut timp, dar nu ai riscat.']]]
+];
+const EVL=[
+['🍔','Foame și cont aproape gol','Contul e aproape gol, iar tu ai poftă de ceva bun.',[['Comand mâncare (80 lei)',{b:-80,e:3},'Gustos, dar greu de justificat acum.'],['Gătesc ce am prin casă (15 lei)',{b:-15,e:2,k:3},'Ai economisit și ai învățat să improvizezi.'],['Împrumut de la un coleg (100 lei)',{b:100,r:-6},'Ai primit banii, dar datoria stă pe conștiința ta.']]],
+['🎧','Reducere tentantă','Vezi niște căști la reducere (250 lei), dar banii sunt puțini.',[['Le cumpăr, merit o recompensă',{b:-250,e:2},'Ai o bucurie scurtă și un cont aproape gol.'],['Le pun pe lista de dorințe',{k:6},'Ai rezistat tentației.'],['Caut o variantă mai ieftină (90 lei)',{b:-90,k:4},'Ai găsit un compromis bun.']]],
+['⚡','Împrumut „în 5 minute”','Primești un mesaj: „Împrumut rapid, fără acte, bani în cont în 5 minute!”',[['Accept împrumutul (400 lei)',{b:400,e:-8},'Banii au intrat, dar dobânzile vor veni luni la rând.'],['Ignor mesajul',{k:6},'Ai evitat o capcană.'],['Raportez mesajul ca fraudă',{k:10,e:2},'Ai protejat și pe alții.']]],
+['🔔','30 de zile gratuite','Un serviciu îți oferă 30 de zile gratis, apoi 60 lei pe lună.',[['Mă înscriu, e gratis',{b:-60,k:-3},'Ai uitat să anulezi, iar prima plată a apărut.'],['Mă înscriu și notez să anulez înainte',{k:6,e:-1},'Ai folosit gratuitul fără să plătești.'],['Nu mă înscriu',{k:3},'Un abonament mai puțin de urmărit.']]]
+];
+const MIS=['Merg la muncă oricum','Îl folosesc așa','Cumpăr unul nou','Uit','Cumpăr tot ce vreau','Las așa','Nu fac nimic','Mă mut','Nu am timp','Iau unii de marcă','O plătesc fără','Mă supăr','Îi lipesc','Comand mâncare','Le cumpăr','Accept împrumutul','Mă înscriu, e gratis','Dau click','Accept fără contract','Cumpăr doar de la brand'];
+function gafa(m){S.mis.push({m,w:S.w});S.st.s=cl(S.st.s+15);flash('⚠ GREȘEALA #'+S.mis.length+': '+m);draw();}
+function flash(m,c){const f=document.createElement('div');f.className='flash '+(c||'');f.textContent=m;document.body.appendChild(f);document.body.classList.add('shake');setTimeout(()=>document.body.classList.remove('shake'),500);setTimeout(()=>f.remove(),3800);}
+let TMR;
+function timer(st){let t=st.tm;const b=$('#tbar');TMR=setInterval(()=>{t-=.1;b.style.width=Math.max(0,t/st.tm*100)+'%';b.className=t<st.tm*.35?'tb hot':'tb';if(t<=0){clearInterval(TMR);gafa('Ai ezitat prea mult, decizia a fost luată pentru tine');st.o[Math.floor(Math.random()*st.o.length)].f();}},100);}
+function ev(low){
+  let e;if(low){if(S.bani>=500||!S.evl.length)return null;e=EVL[S.evl.pop()];}else{if(!S.evq.length)return null;e=EV[S.evq.pop()];}
+  return{tm:S.st.s>=60?12:20,i:e[0],t:e[1],p:`<p>${e[2]}</p>`,o:e[3].map(x=>({l:x[0],f:()=>{if(MIS.some(m=>x[0].startsWith(m)))gafa(e[1]+': '+x[0]);app(x[1],e[1]);S.q.unshift(()=>rez(x));next();}}))};
+}
+function app(d,t){if(d.b)add(t,d.b);['e','r','k'].forEach(k=>{if(d[k])S.st[k]=cl(S.st[k]+d[k]);});draw();}
+function rez(x){const bad=MIS.some(m=>x[0].startsWith(m)),d=x[1],c=[['b','💰'],['e','⚡'],['r','❤️'],['k','🧠']].filter(a=>d[a[0]]).map(a=>`<span class="${d[a[0]]<0?'n':'p'}">${a[1]} ${d[a[0]]>0?'+':'−'}${Math.abs(d[a[0]])}</span>`).join(' &nbsp; ');
+  return{i:bad?'⚠️':'✨',t:bad?'Ai greșit':'Ce s-a întâmplat',p:(bad?`<div class="tip bad"><b>Greșeala #${S.mis.length}.</b> Stresul tău a urcat la ${S.st.s}%. ${S.st.s>=60?'Sub presiune, vei cheltui și vei greși mai ușor.':''}</div>`:'')+`<p>${x[2]}</p><p><b>${c}</b></p>`,o:[{l:bad?'Înțeleg, merg mai departe':'Continuă',f:next,c:'go'}]};}
+// b = salariu brut lunar (lei)
+const CT={
+1900:'București',1800:'Cluj-Napoca',
+1600:'Timișoara,Brașov,Sibiu',
+1500:'Oradea,Constanța',
+1400:'Iași,Arad,Ploiești,Pitești,Târgu Mureș,Alba Iulia',
+1300:'Craiova,Galați,Bacău,Suceava,Baia Mare,Satu Mare,Râmnicu Vâlcea,Deva,Mediaș,Sfântu Gheorghe,Miercurea Ciuc,Bistrița,Zalău,Turda,Lugoj,Sighișoara,Făgăraș,Câmpina,Mangalia,Mioveni,Sebeș,Blaj',
+1200:'Brăila,Buzău,Botoșani,Piatra Neamț,Târgoviște,Focșani,Târgu Jiu,Drobeta-Turnu Severin,Reșița,Slatina,Giurgiu,Călărași,Slobozia,Tulcea,Vaslui,Alexandria,Roman,Onești,Rădăuți,Fălticeni,Dej,Curtea de Argeș,Câmpulung,Caransebeș,Reghin,Aiud,Orăștie,Odorheiu Secuiesc,Târgu Secuiesc,Vatra Dornei,Gura Humorului,Petroșani,Hunedoara,Medgidia,Oltenița,Bârlad,Huși',
+1000:'Caracal,Roșiori de Vede,Turnu Măgurele,Moinești,Râmnicu Sărat,Lupeni,Vulcan,Hațeg,Bocșa,Oravița,Zimnicea,Orșova,Pașcani,Tecuci,Dorohoi,Beiuș,Salonta,Săcele,Râșnov'
+};
+const CITIES=Object.entries(CT).flatMap(([r,s])=>s.split(',').map(n=>({n,r:+r,t:Math.round(r/200)*10}))).sort((a,b)=>a.n.localeCompare(b.n,'ro'));
+// r = chirie garsonieră / lună, t = abonament transport / lună
+const BUGETE=[3500,5000,7000];
+const FACTURI_SAPT=100;
+
+/* ===== 2. LOGICA ===== */
+const $=s=>document.querySelector(s);
+const fmt=n=>Math.round(n).toLocaleString('ro-RO')+' lei';
+let S;
+
+function add(d,a){S.bani+=a;S.log.unshift({d,a,w:S.w});toast(a,d);lowChk();draw();}
+function lowChk(){if(S.bani<500&&!S.low){S.low=1;flash('🚨 ALERTĂ: în cont mai ai doar '+fmt(S.bani)+'!','alert');}else if(S.bani>=500)S.low=0;}
+function toEco(x){S.bani-=x;S.eco+=x;S.log.unshift({d:'Transfer în fond de rezervă',a:-x,w:S.w});toast(-x,'Fond de rezervă');lowChk();draw();}
+function toast(a,d){const t=document.createElement('div');t.className='toast '+(a<0?'n':'p');t.textContent=(a<0?'−':'+')+fmt(Math.abs(a))+' · '+d;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
+
+function draw(){
+  const h=$('#hud');document.body.classList.toggle('stress',!!S&&S.st.s>=60);
+  if(!S){h.innerHTML='';$('#ledger').innerHTML='';return;}
+  const nv=['Mutarea','Tentația','Surprizele','Bilanțul'];
+  h.innerHTML=`<div class="who"><span class="av">${S.job.e}</span><div><b>${S.job.n}</b><small>${S.city.n}</small></div></div>
+   <div class="bal"><small>Bani în cont</small><b class="${S.bani<500?'n':''}">${fmt(S.bani)}</b></div>
+   <div class="chips"><span>🛟 ${fmt(S.eco)}</span><span class="${S.mis.length?'n':''}">⚠ ${S.mis.length}</span><span class="${S.dat>0?'n':''}">💳 ${fmt(S.dat)}</span></div>
+   <div class="bars">${[['⚡',S.st.e],['❤️',S.st.r],['🧠',S.st.k],['😰',S.st.s]].map(a=>`<span>${a[0]}</span><i><u style="width:${a[1]}%"></u></i>`).join('')}</div><ol class="track">${nv.map((s,i)=>`<li class="${i+1<S.w?'done':i+1===S.w?'now':''}">${i+1}<small>${s}</small></li>`).join('')}</ol>${S.bani<500?'<div class="lowbar">🚨 Sub 500 lei. Fiecare cheltuială contează acum.</div>':''}`;
+  $('#ledger').innerHTML=S.log.map(l=>`<li><span>${l.d}<small>Săpt. ${l.w}</small></span><b class="${l.a<0?'n':'p'}">${l.a<0?'−':'+'}${fmt(Math.abs(l.a))}</b></li>`).join('');
+}
+
+function ICON(t){return/salariu/i.test(t)?'💸':/rezerv/i.test(t)?'🛟':/mănânci/i.test(t)?'🍜':/Sfârșit/.test(t)?'📆':/fără bani/.test(t)?'🚨':/TikTok/.test(t)?'📱':/Verificarea/.test(t)?'🔍':/side-hustle/.test(t)?'📦':/Laptop/.test(t)?'💻':/prieten/.test(t)?'🤝':/decizie/.test(t)?'🎯':/Bilanț/.test(t)?'🏆':'🎮';}
+
+function show(st){clearInterval(TMR);
+  $('#stage').innerHTML=`<div class="scene"><div class="ic">${st.i||ICON(st.t)}</div><h2>${st.t}</h2></div>${st.tm?'<div class="tbw"><div id="tbar" class="tb"></div></div>':''}<div class="txt">${st.p}</div><div class="opts">${st.o.map((o,i)=>`<button data-i="${i}" class="${o.c||''}">${o.l}</button>`).join('')}</div>`;
+  $('#stage').querySelectorAll('button').forEach(b=>b.onclick=()=>{clearInterval(TMR);st.o[b.dataset.i].f();});if(st.tm)timer(st);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function next(){
+  while(S.q.length){const st=S.q.shift()();if(st){show(st);return;}}
+}
+
+/* ----- ecranul de început ----- */
+function start(){
+  S=null;draw();
+  const cats=[...new Set(JOBS.map(j=>j.c))];
+  $('#stage').innerHTML=`<div class="scene"><div class="ic">🎮</div><h2>Alege-ți personajul</h2></div>
+  <div class="txt"><p>Ai terminat liceul și ai primul job. Te muți într-un oraș nou, cu banii tăi. Ai 4 săptămâni, iar fiecare alegere contează: pentru bani, energie, relații și ce înveți.</p><div class="tip">Vei învăța: salariu brut vs. net, fond de rezervă, chirie și contract, credite, abonamente și fraude.</div></div>
+  <label for="k">Domeniul</label><select id="k"><option value="">Toate (${JOBS.length} meserii)</option>${cats.map(c=>`<option>${c}</option>`).join('')}</select>
+  <label for="j">Meseria ta</label><select id="j"></select>
+  <label for="c">Orașul (${CITIES.length} localități)</label><select id="c">${CITIES.map((c,i)=>`<option value="${i}">${c.n} (chirie ~${fmt(c.r)})</option>`).join('')}<option value="x">Alt oraș (introduc eu chiria)</option></select>
+  <div id="xc" style="display:none"><label for="cn">Numele orașului</label><input id="cn" type="text" maxlength="30" placeholder="ex: Comuna mea"><label for="cr">Chiria lunară pentru o garsonieră (lei)</label><input id="cr" type="number" min="0" step="50" value="1200" inputmode="numeric"></div>
+  <label for="h">Locuința</label><select id="h"><option value="0">Garsonieră singur (chirie întreagă)</option><option value="1">Cu un coleg (jumătate din chirie)</option></select>
+  <label for="b">Banii cu care pornești (lei)</label><input id="b" type="number" min="0" max="200000" step="100" value="5000" inputmode="numeric">
+  <p id="hint" class="tip"></p>
+  <div class="opts"><button class="go" id="go">Începe jocul</button><button id="rnd">Surprinde-mă: meserie aleatorie</button></div>`;
+  const fill=()=>{const k=$('#k').value;$('#j').innerHTML=JOBS.map((j,i)=>[j,i]).filter(a=>!k||a[0].c===k).map(a=>`<option value="${a[1]}">${a[0].e} ${a[0].n} (brut ${a[0].b})</option>`).join('');};
+  fill();$('#k').onchange=fill;
+  const cityV=()=>{const v=$('#c').value;if(v==='x'){const r=Math.max(0,+$('#cr').value||0)||1200;return{n:$('#cn').value.trim()||'Orașul meu',r,t:Math.round(r/200)*10};}return CITIES[v];};
+  const bud=()=>Math.max(0,Math.min(200000,Math.round(+$('#b').value)||0));
+  const hint=()=>{$('#xc').style.display=$('#c').value==='x'?'block':'none';const c=cityV(),ch=$('#h').value==='1'?c.r/2:c.r;$('#hint').textContent=`La mutare plătești garanția și prima chirie: ${fmt(ch*2)}. Cu cât pornești cu mai mult, cu atât ai mai multă libertate.`;};
+  ['c','h','cr','b'].forEach(i=>$('#'+i).oninput=hint);hint();
+  const go=j=>init(j,cityV(),$('#h').value==='1',bud());
+  $('#go').onclick=()=>go(JOBS[$('#j').value]);
+  $('#rnd').onclick=()=>go(JOBS[Math.floor(Math.random()*JOBS.length)]);
+}
+
+function init(job,city,coloc,buget){
+  S={mis:[],st:{e:70,r:60,k:50,s:10},evq:shuffle([...EV.keys()]),evl:shuffle([...EVL.keys()]),low:0,w:1,bani:0,eco:0,dat:0,job,city,chirie:coloc?city.r/2:city.r,mancare:380,fl:{},log:[],q:[]};
+  add('Buget de pornire',buget);
+  add('Garanție chirie',-S.chirie);
+  add('Prima chirie',-S.chirie);
+  S.q=[salariu,rezerva,mancare,ev,ev,()=>ev(1),()=>closeW(1),tentatie,ev,ev,()=>ev(1),()=>closeW(2),sideRes,laptop,ev,ev,()=>ev(1),()=>closeW(3),prieten,ev,ev,()=>ev(1),()=>closeW(4),decizie,final];
+  next();
+}
+
+/* ----- săptămâna 1 ----- */
+function salariu(){
+  const b=S.job.b,cas=b*.25,cass=b*.10,imp=(b-cas-cass)*.10,net=b-cas-cass-imp;
+  add('Primul salariu (net)',net);
+  return{t:'Ziua salariului',
+    p:`<p>Contractul tău spune <b>${fmt(b)}</b>, dar în cont intră mai puțin:</p>
+    <table><tr><td>Salariu brut</td><td>${fmt(b)}</td></tr>
+    <tr><td>Contribuție la pensie (25%)</td><td>−${fmt(cas)}</td></tr>
+    <tr><td>Contribuție la sănătate (10%)</td><td>−${fmt(cass)}</td></tr>
+    <tr><td>Impozit pe venit (10%)</td><td>−${fmt(imp)}</td></tr>
+    <tr><td><b>Salariu net, intrat în cont</b></td><td><b>${fmt(net)}</b></td></tr></table>
+    <div class="tip">Din ${fmt(b)} brut ai primit doar ${Math.round(net/b*100)}%. Procentele sunt simplificate.</div>${b<=MIN_BRUT?'<div class="tip">Ai salariul minim brut pe economie (4.325 lei din iulie 2026).</div>':''}`,
+    o:[{l:'Continuă',f:next,c:'go'}]};
+}
+function rezerva(){
+  const x=S.job.b*.585;
+  return{t:'Fondul de rezervă',p:'<p>Un specialist îți spune să pui bani deoparte din prima zi, pentru situațiile neprevăzute. Cât transferi din salariu?</p>',
+    o:[{l:`Pun 20% (${fmt(x*.2)})`,f:()=>{toEco(x*.2);S.fl.rez=1;next();}},
+       {l:`Pun 10% (${fmt(x*.1)})`,f:()=>{toEco(x*.1);S.fl.rez=1;next();}},
+       {l:'Nu pun nimic, văd la sfârșit de lună',f:()=>{gafa('Nu ai pus nimic deoparte din salariu');next();}}]};
+}
+function mancare(){
+  const set=(m)=>()=>{S.mancare=m;S.st.e=cl(S.st.e+(m<300?4:m>500?-6:0));next();};
+  return{t:'Cum mănânci în luna asta?',p:'<p>Alegerea se aplică în fiecare săptămână.</p>',
+    o:[{l:'Gătesc acasă (250 lei / săptămână)',f:set(250)},
+       {l:'Un pic și-un pic (380 lei / săptămână)',f:set(380)},
+       {l:'Comand des, nu am timp (550 lei / săptămână)',f:set(550)}]};
+}
+
+/* ----- închiderea săptămânii ----- */
+function closeW(n){
+  add(`Mâncare, săpt. ${n}`,-S.mancare);
+  add(`Facturi, săpt. ${n}`,-FACTURI_SAPT);
+  let extra='';
+  if(n===1){add('Abonament transport (lună)',-S.city.t);extra=`, transport ${fmt(S.city.t)}`;}
+  if(n===4){add('Chiria pentru luna următoare',-S.chirie);extra=`, chirie luna viitoare ${fmt(S.chirie)}`;}
+  S.st.e=cl(S.st.e-3);if(S.st.s>=60){const x=S.st.s*3;add('Cheltuieli din stres (comenzi, impulsuri)',-x);S.st.e=cl(S.st.e-6);}S.st.s=cl(S.st.s-8);S.w=Math.min(n+1,4);draw();
+  return{t:`Sfârșit de săptămâna ${n}`,
+    p:`<p>Mâncare ${fmt(S.mancare)}, facturi ${fmt(FACTURI_SAPT)}${extra}.</p><p>În cont: <b class="${S.bani<0?'n':''}">${fmt(S.bani)}</b></p>`,
+    o:[{l:'Continuă',f:()=>{if(S.bani<0){gafa('Contul a ajuns pe minus');S.q.unshift(urgenta);}next();},c:'go'}]};
+}
+function urgenta(){
+  const need=Math.ceil(-S.bani/100)*100+300;
+  const o=[];
+  if(S.eco>0){const u=Math.min(S.eco,need);o.push({l:`Folosesc fondul de rezervă (${fmt(u)})`,f:()=>{S.eco-=u;add('Bani din fondul de rezervă',u);next();}});}
+  o.push({l:`Cer ajutor familiei (${fmt(need)})`,f:()=>{S.fl.fam=1;gafa('Ai rămas fără bani și ai cerut ajutor');add('Ajutor de la familie',need);next();}});
+  o.push({l:`Card de credit (${fmt(need)}, dobândă 20%)`,f:()=>{gafa('Ai luat credit cu dobândă de 20%');S.fl.credit=1;S.dat+=need*1.2;add('Retragere card de credit',need);next();}});
+  return{t:'Ai rămas fără bani',p:`<p>Contul e pe minus. Ai nevoie de cel puțin ${fmt(need)} ca să ajungi până la capăt. Ce faci?</p>`,o};
+}
+
+/* ----- săptămâna 2 ----- */
+function tentatie(){
+  return{tm:S.st.s>=60?10:15,t:'Un clip pe TikTok',
+    p:'<p>Un influencer spune că face „3.000 € pe lună din dropshipping, fără efort”. Cursul lui și primul stoc costă <b>500 lei</b>.</p>',
+    o:[{l:'Investesc 500 lei, merită riscul',f:()=>{gafa('Ai investit 500 lei într-o promisiune neverificată');S.fl.inv=1;add('Curs și stoc dropshipping',-500);next();}},
+       {l:'Mai întâi verific costurile reale',f:()=>{S.fl.ver=1;S.q.unshift(analiza);next();}},
+       {l:'Ignor clipul',f:()=>{S.fl.ver=1;S.fl.hunt=3;next();}}]};
+}
+function analiza(){
+  const F=(t,g)=>`<span class="fl" ${g?'data-g="1"':''} onclick="this.classList.toggle('on')">${t}</span>`;
+  return{i:'🔍',t:'Vânătoare de capcane',
+    p:`<p>Atinge frazele care ți se par suspecte, apoi apasă Verifică. Atenție: nu toate sunt capcane.</p>
+    <div class="ad">🔥 Câștigă 3.000 € lunar din telefon! ${F('Fără experiență',1)}, ${F('fără investiție mare',1)}, ${F('cursuri video incluse')}. ${F('Doar 5 locuri rămase azi!',1)} Rezultate ${F('garantate 100%',1)}, vezi ${F('poze cu mașini de lux',1)} și ${F('suport 24/7')}.</div>`,
+    o:[{l:'Verifică',c:'go',f:()=>{
+      const ok=document.querySelectorAll('.fl.on[data-g]').length,bad=document.querySelectorAll('.fl.on:not([data-g])').length;
+      const sc=ok-bad;S.fl.hunt=sc;S.st.k=cl(S.st.k+sc*3);
+      S.q.unshift(()=>({i:'🧠',t:'Rezultat vânătoare',p:`<p>Ai găsit <b>${ok} din 5</b> capcane${bad?` și ai marcat ${bad} fraze corecte`:''}.</p><div class="tip">Costuri ascunse: reclame ~300 lei, retururi ~120 lei, comision ~60 lei, impozit 10% din profit. Majoritatea celor care încep nu își recuperează investiția în prima lună.</div>`,
+        o:[{l:'Renunț la ideea asta',f:next},{l:'Tot investesc 500 lei, dar știu riscul',f:()=>{S.fl.inv=1;add('Curs și stoc dropshipping',-500);next();}}]}));
+      next();}}]};
+}
+
+/* ----- săptămâna 3 ----- */
+function sideRes(){
+  if(!S.fl.inv)return null;
+  if(Math.random()<.7){
+    const imp=42;
+    add('Vânzări dropshipping',900);add('Reclame, retururi, comision',-480);add('Impozit pe venit',-imp);
+    return{t:'Rezultatul side-hustle-ului',
+      p:`<p>Ai vândut ceva, dar uită-te la cifre:</p><table>
+      <tr><td>Vânzări</td><td>900 lei</td></tr><tr><td>Reclame, retururi, comision</td><td>−480 lei</td></tr>
+      <tr><td>Impozit (aprox.)</td><td>−${imp} lei</td></tr><tr><td><b>Intrat în cont</b></td><td><b>${fmt(900-480-imp)}</b></td></tr></table>
+      <div class="tip">Ai investit 500 lei și ai recuperat ${fmt(900-480-imp)}. Rezultat: −${fmt(500-(900-480-imp))}, plus ore de muncă.</div>`,
+      o:[{l:'Continuă',f:next,c:'go'}]};
+  }
+  return{t:'Rezultatul side-hustle-ului',
+    p:'<p>Reclamele nu au adus nicio vânzare. Cei 500 lei sunt pierduți.</p><div class="tip">Se întâmplă destul de des și nu apare în clipurile cu „bani rapizi”.</div>',
+    o:[{l:'Continuă',f:next,c:'go'}]};
+}
+function laptop(){
+  const o=[];
+  if(S.eco>=600)o.push({l:'Folosesc fondul de rezervă (600 lei)',f:()=>{S.eco-=600;S.log.unshift({d:'Reparație laptop (din fond)',a:-600,w:S.w});draw();S.fl.usedRez=1;lowChk();next();}});
+  o.push({l:'Plătesc reparația din cont (600 lei)',f:()=>{add('Reparație laptop',-600);next();}});
+  o.push({l:'Laptop nou, în rate (800 lei acum, restul cu dobândă)',f:()=>{gafa('Ai cumpărat în rate, cu dobândă');S.fl.credit=1;S.dat+=1600*1.15;add('Avans laptop nou',-800);next();}});
+  return{t:'Laptopul s-a stricat',p:'<p>Ai nevoie de el pentru muncă. Reparația costă 600 lei, iar un laptop nou 2.400 lei. Ce faci?</p>',o};
+}
+
+/* ----- săptămâna 4 ----- */
+function prieten(){
+  return{t:'Un prieten îți cere bani',p:'<p>Un prieten are nevoie de 500 lei „până la salariu”. Nu e sigur când ți-i dă înapoi.</p>',
+    o:[{l:'Îi dau 500 lei',f:()=>{S.fl.imp=1;add('Împrumut dat unui prieten',-500);next();}},
+       {l:'Îi dau 200 lei, cât îmi permit',f:()=>{add('Ajutor dat unui prieten',-200);next();}},
+       {l:'Refuz politicos',f:next}]};
+}
+function decizie(){
+  const o=[];
+  if(S.dat>0&&S.bani>0)o.push({l:'Plătesc datoriile cât pot',f:()=>{const p=Math.min(S.bani,S.dat);S.dat-=p;add('Plată datorii',-p);next();}});
+  if(S.bani>0)o.push({l:'Pun jumătate din bani în fondul de rezervă',f:()=>{toEco(Math.round(S.bani/2));next();}});
+  o.push({l:'Mă răsplătesc cu o ieșire și haine noi',f:()=>{if(S.bani>0)add('Ieșiri și haine',-Math.round(S.bani/2));next();}});
+  return{t:'Ultima decizie',p:`<p>Luna s-a încheiat. În cont ai <b>${fmt(S.bani)}</b>${S.dat>0?` și datorii de ${fmt(S.dat)}`:''}. Ce faci cu banii?</p>`,o};
+}
+
+function cheltuieli(){
+  const C={'🏠 Chirie și garanție':0,'🍜 Mâncare':0,'💡 Facturi și transport':0,'🎉 Ieșiri, cumpărături, impulsuri':0,'⚠ Pierderi (fraude, rate, taxe)':0};
+  S.log.filter(l=>l.a<0&&!/Transfer în fond|din fond/.test(l.d)).forEach(l=>{const x=-l.a,d=l.d;
+    const k=/chiri|Garanț/i.test(d)?0:/Mâncare/.test(d)?1:/Facturi|transport|curent/i.test(d)?2:/dropshipping|Avans|Impozit|Retragere|datorii|stres|Împrumut|Contract|prieten/i.test(d)?4:3;C[Object.keys(C)[k]]+=x;});
+  const t=Object.values(C).reduce((a,b)=>a+b,0)||1;
+  return `<p><b>Unde au plecat banii</b> (${fmt(t)} în total)</p>`+Object.entries(C).map(([n,v])=>`<div class="fb"><span style="width:190px">${n}</span><i><u style="width:${Math.round(v/t*100)}%"></u></i><b style="width:70px">${Math.round(v/t*100)}%</b></div>`).join('')+`<div class="tip">Regula 50/30/20: aproximativ 50% pentru nevoi (chirie, mâncare, facturi), 30% pentru dorințe și 20% pentru economii. Tu cum ai stat?</div>`;
+}
+/* ----- scorul final ----- */
+function final(){
+  const f=S.fl;let p=0;const ok=[],ko=[];
+  const r=(c,pts,y,n)=>{if(c){p+=pts;ok.push(y);}else ko.push(n);};
+  r(S.bani>=0,15,'Ai încheiat luna fără să fii pe minus.','Contul a ajuns pe minus. Fă un buget pe săptămână.');
+  r(S.dat===0,20,'Nu ai rămas cu datorii.','Ai rămas cu datorii. Plătește-le primele.');
+  r(S.eco>=1500,25,'Ai un fond de rezervă solid.','Fondul de rezervă e mic. Țintește cel puțin o chirie și jumătate.');
+  r((f.hunt||0)>=3,15,'Ai depistat capcanele dintr-o reclamă de „bani rapizi”.','Capcanele dintr-o reclamă false te pot păcăli. Verifică costurile și taxele.');
+  r(!f.fam&&!f.credit,15,'Nu ai avut nevoie de credit sau de ajutor.','Ai apelat la credit sau la familie. Un fond de rezervă te scutește.');
+  r(!!f.rez,10,'Ai pus bani deoparte din prima zi.','Nu ai pus nimic deoparte din salariu.');
+  p=cl(p);const t=S.st,tot=cl((p*2+t.e+t.r+t.k)/5-S.mis.length*3);
+  const rk=tot>=85?'Legendă':tot>=70?'Adult pe bune':tot>=50?'Ucenic al vieții':'Începător',s=Math.round(tot/20);
+  const bar=(l,v)=>`<div class="fb"><span>${l}</span><i><u style="width:${v}%"></u></i><b>${v}</b></div>`;
+  return{i:'🏆',t:'Scorul tău de viață',
+    p:`<p class="score ${tot>=50?'p':'n'}">${tot}/100</p><p class="stars">${'★'.repeat(s)}${'☆'.repeat(5-s)}</p><p class="rank">${rk}</p>
+    <p>${S.job.e} ${S.job.n}, ${S.city.n}</p>${bar('💰 Finanțe',p)}${bar('⚡ Energie',t.e)}${bar('❤️ Relații',t.r)}${bar('🧠 Dezvoltare',t.k)}
+    <div class="tip bad"><b>⚠ ${S.mis.length} greșeli</b><ul>${S.mis.map(x=>`<li>Săpt. ${x.w}: ${x.m}</li>`).join('')||'<li>Nicio greșeală majoră. Bravo!</li>'}</ul></div><p><b>Ce ai făcut bine</b></p><ul>${ok.map(x=>`<li>${x}</li>`).join('')||'<li>Încă nimic. Încearcă din nou.</li>'}</ul>
+    <p><b>Ce poți îmbunătăți</b></p><ul>${ko.map(x=>`<li>${x}</li>`).join('')||'<li>Nimic major.</li>'}</ul>
+    ${cheltuieli()}<div class="tip">Banii din joc erau fictivi. Cum ai fi decis cu banii tăi? Încearcă altă meserie.</div>`,
+    o:[{l:'Joacă din nou',f:start,c:'go'},{l:'Copiază scorul',f:()=>{const m=`Am obținut ${tot}/100 (${rk}) ca ${S.job.n} în ${S.city.n} în „Prima ta lună de adult”!`;try{navigator.clipboard.writeText(m);}catch(e){}const t=document.createElement('div');t.className='toast p';t.textContent='Scor copiat';document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}}]};
+}
+
+start();
+</script>
+</body>
+</html>
